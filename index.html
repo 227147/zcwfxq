@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>灵犀 · AI 工具集</title>
+  <meta name="description" content="浏览器本地运行的智能小工具：智能摘要、关键词提取、情感分析、智能配色、灵感生成。无需联网，不上传任何文本。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 极光背景 -->
+  <div class="aurora" aria-hidden="true">
+    <i class="glow g1"></i>
+    <i class="glow g2"></i>
+    <i class="glow g3"></i>
+  </div>
+
+  <div class="shell">
+
+    <!-- 侧栏 -->
+    <aside class="side">
+      <div class="brand">
+        <div class="logo">⬡</div>
+        <div class="brand-t">
+          <b>灵 犀</b>
+          <span>AI TOOLKIT · v1.0</span>
+        </div>
+      </div>
+      <nav class="menu" id="menu">
+        <button class="item active" data-t="sum">
+          <i>✦</i><span>智能摘要</span><em>TextRank</em>
+        </button>
+        <button class="item" data-t="kw">
+          <i>❋</i><span>关键词提取</span><em>TF 频次</em>
+        </button>
+        <button class="item" data-t="senti">
+          <i>◈</i><span>情感分析</span><em>词典法</em>
+        </button>
+        <button class="item" data-t="color">
+          <i>◐</i><span>智能配色</span><em>HSL 和谐</em>
+        </button>
+        <button class="item" data-t="idea">
+          <i>✧</i><span>灵感生成器</span><em>随机组合</em>
+        </button>
+      </nav>
+      <div class="privacy">
+        <b>🔒 本地计算</b>
+        <p>所有文本仅在此浏览器内处理，不联网、不上传、不留痕。</p>
+      </div>
+    </aside>
+
+    <!-- 主区 -->
+    <main class="main">
+
+      <!-- ① 智能摘要 -->
+      <section class="tool on" id="sum">
+        <header class="tool-head">
+          <h2>智能摘要</h2>
+          <p>贴一段长文，算法按句子间词汇关联打分，抽出最重要的几句。纯本地 TextRank 简化版。</p>
+        </header>
+        <div class="io">
+          <textarea id="sumIn" rows="9" placeholder="粘贴文章、新闻、报告……（建议 200 字以上）"></textarea>
+          <div class="ctrl-row">
+            <label>压缩到 <output id="sumRatioOut">30</output>%</label>
+            <input type="range" id="sumRatio" min="10" max="70" value="30" step="5" />
+            <button class="btn" id="sumRun">✦ 生 成 摘 要</button>
+          </div>
+          <div class="out" id="sumOut" hidden>
+            <div class="out-bar"><span>摘要结果</span><button class="copy" data-from="sumText">复制</button></div>
+            <p id="sumText"></p>
+            <p class="meta" id="sumMeta"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ② 关键词 -->
+      <section class="tool" id="kw" hidden>
+        <header class="tool-head">
+          <h2>关键词提取</h2>
+          <p>按词频统计并过滤停用词，输出 Top 10 关键词与热度条。</p>
+        </header>
+        <div class="io">
+          <textarea id="kwIn" rows="9" placeholder="粘贴任意中文 / 英文文本……"></textarea>
+          <div class="ctrl-row">
+            <button class="btn" id="kwRun">❋ 提 取 关 键 词</button>
+          </div>
+          <div class="out" id="kwOut" hidden>
+            <div class="out-bar"><span>关键词 · 按热度</span><button class="copy" data-from="kwText">复制</button></div>
+            <ul class="kw-list" id="kwList"></ul>
+            <p class="meta" id="kwMeta"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ③ 情感分析 -->
+      <section class="tool" id="senti" hidden>
+        <header class="tool-head">
+          <h2>情感分析</h2>
+          <p>基于情感词典打分：积极词 +1，消极词 −1，含「不」时反转。输出情绪指数与倾向。</p>
+        </header>
+        <div class="io">
+          <textarea id="sentiIn" rows="6" placeholder="写一句评价，如：这家店服务不错，就是上菜太慢了。"></textarea>
+          <div class="ctrl-row">
+            <button class="btn" id="sentiRun">◈ 分 析 情 绪</button>
+          </div>
+          <div class="out" id="sentiOut" hidden>
+            <div class="gauge">
+              <div class="gauge-track">
+                <i class="gauge-needle" id="sentiNeedle"></i>
+                <span class="neg">消极</span><span class="mid">中性</span><span class="pos">积极</span>
+              </div>
+            </div>
+            <p class="senti-verdict" id="sentiVerdict"></p>
+            <ul class="hits" id="sentiHits"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ④ 智能配色 -->
+      <section class="tool" id="color" hidden>
+        <header class="tool-head">
+          <h2>智能配色</h2>
+          <p>给定一个种子色，按 HSL 色轮和谐规则（互补 / 三分 / 类似）生成整套配色，自动判断深浅文字。点击色块复制 HEX。</p>
+        </header>
+        <div class="io">
+          <div class="ctrl-row">
+            <input type="color" id="seedColor" value="#7c5cff" />
+            <select id="harmony">
+              <option value="ana">类似色 ·柔和</option>
+              <option value="comp">互补色 ·撞色</option>
+              <option value="tri">三分色 ·活泼</option>
+              <option value="split">分裂互补 ·进阶</option>
+            </select>
+            <button class="btn" id="colorRun">◐ 生 成 配 色</button>
+          </div>
+          <div class="palette" id="palette"></div>
+          <div class="palette-preview" id="palPreview" hidden>
+            <div class="pv-card">
+              <h4>页面示例</h4><p>正文文字示例 · The quick brown fox.</p>
+              <button class="pv-btn">按钮 Button</button>
+            </div>
+            <div class="pv-card dark">
+              <h4>深色卡片</h4><p>反色文字示例 · 0123456789</p>
+              <button class="pv-btn ghost">幽灵按钮</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ⑤ 灵感生成器 -->
+      <section class="tool" id="idea" hidden>
+        <header class="tool-head">
+          <h2>灵感生成器</h2>
+          <p>随机组合「主语 × 动作 × 载体 × 风格」，产出产品点子 / 选题 / 命名方向。撞不出灵感就再摇一次。</p>
+        </header>
+        <div class="io">
+          <div class="idea-slots" id="ideaSlots"></div>
+          <div class="ctrl-row">
+            <button class="btn" id="ideaRun">✧ 摇 一 次 灵感</button>
+            <button class="btn ghost" id="ideaCopy">收藏这条</button>
+          </div>
+          <div class="out" id="ideaOut" hidden>
+            <div class="out-bar"><span>灵感</span><button class="copy" data-from="ideaText">复制</button></div>
+            <p id="ideaText"></p>
+          </div>
+          <ul class="fav-list" id="favList"></ul>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
